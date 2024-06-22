@@ -273,3 +273,149 @@ var sub = function(x,y){
 함수 표현식으로 함수를 정의하면 함수 호이스팅이 발생하는것이 아니라 변수 호이스팅이 발생한다.
 
 함수 호이스팅은 함수가 선언되고나서 호출된다는 개념을 무시하기때문에 함수 표현식을 사용하는것을 권장한다.
+
+
+
+## Function 함수
+
+생성자 함수는 객체를 생성하는 함수를 말한다.
+
+- 생성자 함수 객체 생성 방식
+
+```jsx
+var add = new Function('x','y','return x + y');
+console.log(add(2,5)); //7
+```
+
+<aside>
+💡 **즉시 실행 함수**
+
+</aside>
+
+아래와 같이 함수 선언문에 **즉시 실행**을 하려고 하면 에러가 난다
+
+```jsx
+function aa(){
+     var a=10;
+     console.log('add1');
+     return function(x,y){
+          return x + y + a; 
+     };
+}(); //Expression expected 에러가 발생한다
+```
+
+함수 선언과 동시에 실행을 하려면 함수 표현식으로 해석하도록 해야한다.
+
+- 첫번째 방법
+    - 바깥에 () 삽입
+
+```jsx
+(function aa(){
+     var a=10;
+     console.log('add1');
+     return function(x,y){
+          return x + y + a; 
+     };
+}());
+
+//add1
+```
+
+- 두번째 방법
+    - ()을 함수 선언문에 넣고 실행
+
+```jsx
+function (aa(){
+     var a=10;
+     console.log('add1');
+     return function(x,y){
+          return x + y + a; 
+     };
+})();
+
+//add1
+```
+
+두가지 모두 똑같이 동작한다
+
+즉시 실행할수 있는 함수 표현식이라는 것을 알려주면 즉시실행을 할 수 있다.
+
+```jsx
+var aa = function(){
+     var a=10;
+     console.log('add1');
+     return function(x,y){
+          return x + y + a; 
+     };
+}();
+```
+
+위와 같이 함수 표현식 방법으로 사용후 실행하는 방법도 존재한다.
+
+```jsx
+var aa = (function(){
+     var a=10;
+     console.log('add1');
+     return function(x,y){
+          return x + y + a; 
+     };
+}());
+```
+
+즉시 실행 함수라는 것을 알려주기위해서 위와 같은 방법을 선호한다고 한다.
+
+### 결론
+
+함수를 즉시 실행하고 싶으면 함수 표현식으로 바꿔줘야 한다
+
+함수 표현식으로 바꾸는 방법은 대입연산자(=)에 오른쪽에 위치해 있거나 ()을 통해 함수를 감싸주면 된다.
+
+### Function 함수를 사용하면 안되는 이유
+
+```jsx
+var add1  = function addtest(){
+     var a=10;
+     return function(x,y){
+          return x + y + a; 
+     };
+}();
+
+console.log(add1(1,2)); // 13
+var add2  = (function addtest(){
+     var a=10;
+     return Function('x','y','return x + y + a');
+}());
+
+console.log(add2(1,2)); //a is not defined
+```
+
+문자열로 인식해 클로저와 같은 기능을 사용하지 못한다.
+
+```jsx
+var add2  = (function addtest(){
+     var a=10;
+     return Function('x','y',`return x + y + ${a}`);
+}());
+```
+
+ES6문법인 표현식 삽입 문법으로  a를 변수로 인식해주면  13이 잘 출력되긴 하지만 권장하지 않는 방법이라고 생각한다.
+
+### 화살표 함수
+
+ES6에 도입된 함수,  function 키워드 대신에 사용해 좀 더 간략한 방법으로 함수를 선언할 수 있다.
+
+화살표 함수는 **항상 익명 함수**로 정의한다
+
+```jsx
+const add = (x,y) => x+y;
+console.log(add(2,5));
+```
+
+화살표 함수는 함수선언문이나 함수 표현식을 대체하기 위해서 디자인 된것은 아니다.
+
+표현만 간략한 것이 아니라 내부 동작 또한 간략화되어 있다.
+
+- 다른점
+    - 생성자 함수로 사용할 수 없다
+    - this,prototype,arguments에 대해서 다르다
+    - 자세한 건 26.3절에서 자세히 살펴본다
