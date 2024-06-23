@@ -419,3 +419,455 @@ console.log(add(2,5));
     - 생성자 함수로 사용할 수 없다
     - this,prototype,arguments에 대해서 다르다
     - 자세한 건 26.3절에서 자세히 살펴본다
+
+
+## 함수 호출
+
+인수는 함수를 호출할때 지정하며 개수와 타입에 제한이 없다.
+
+```jsx
+//함수 선언문
+function add(x,y){
+  //함수 몸체
+	return x + y;
+}
+
+//함수 호출
+//인수 1과 2가 매개변수 x와 y에 순서대로 할당되고 함수 몸체의 문들이 실행된다.
+```
+
+x,y는 undefined로 초기화 된 후 인수가 할당되기때문에 인수가 부족하면
+
+2 + undefined 연산을 하게되어 NaN이 출력된다
+
+```jsx
+function add(x,y){
+	return x + y;
+}
+
+console.log(add(2)) //NaN
+```
+
+- 초과된 인수는 무시된다
+
+```jsx
+function add(x,y){
+	return x + y;
+}
+
+console.log(add(2,3,4)) //5
+```
+
+사실 초과된 인수는 없어지는게 아니다
+
+```jsx
+function add (x,y){
+     console.log(arguments); //[Arguments] { '0': 1, '1': 2, '2': 3 }
+     return x+y;
+}
+
+add(1,2,3);
+```
+
+arguments 객체는 함수를 정의할때 개수를 확정할수 없는 가변 인자 함수를 구할때 유용하게 사용된다.
+
+## 인수 확인
+
+```jsx
+function add(x,y){
+	return x + y;
+}
+
+console.log(add(2,3)) //5
+console.log(add('a','b')) // 'ab'
+```
+
+- x,y에 대해서 typeof x === number 같은 문장으로 조건을 줌
+    - 틀릴시 throw new TypeError를 던지는 방법
+- arguments객체를 통해 인수개수를 확인할수도 있고
+- 단축평가를 통해 매개변수에 기본값을 할당해주는 방법도 있다.
+
+동적타입 언어이기때문에 런타임에 타입이 결정된다 이를 막기 위해는 타입스크립트를 사용하는방법도 있다. 
+
+- 논리곱
+    - 만약 `x`를 `true`로 반환할 수 있으면 `x`를 반환하고, 그렇지 않으면 `y`를 반환합니다.
+
+```jsx
+function add(a, b, c) {
+  a = a || 0;
+  b = b || 0;
+  c = c || 0;
+  return a + b + c;
+}
+
+console.log(add(1, 2, 3)); // 6
+console.log(add(1, 2)); // 3
+console.log(add(1)); // 1
+console.log(add()); // 0
+```
+
+ES6에 도입된
+
+매개변수 기본값은 매개변수에 인수를 전달하지 않을경우와 undefined를 전달한 경우에만 유효하다.
+
+```jsx
+function add(a = 0, b = 0, c = 0) {
+  return a + b + c;
+}
+
+console.log(add(1, 2, 3)); // 6
+console.log(add(1, 2)); // 3
+console.log(add(1)); // 1
+console.log(add()); // 0
+```
+
+매개변수의 최대 개수는 정해져 있진 않지만 매개변수는 순서가 있기때문에 많아지는걸 권장하지 않는다. 좋은건 0개 최대 3개정도가 바람직하다.
+
+아니면 객체를 넘겨 key : value로 깔끔하게 관리하는 방법도 있다 이때 내부로 전달한 객체를 함수 내부에서 변경하면 함수 외부의 객체가 변경되는 부수효과(side effect)가 발생할수 있다.
+
+<aside>
+💡 사이트 이펙트
+함수 내부에서 외부에 있는것들을 수정시키는 것을 말한다.
+
+</aside>
+
+## 반환문
+
+- 함수는 return 키워드와 표현식(반환값)으로 이뤄진 반환문을 사용해 실행 결과를 함수 외부로 반환한다.
+- 함수 호출은 표현식이다.
+
+- 규칙
+    - return이 없으면 undefined 반환
+    - return이후에 문은 실행되지 않는다
+    - 반환문은 함수 몸체에서만 사용이 가능하다
+
+```jsx
+return; // undefined
+```
+
+nodejs는 모듈시스템에 의해 파일별로 독립적인 파일 스코프를 갖는다 그래서 파일의 가장 바깥 영역에 반환문을 사용해도 에러가 발생하지 않는다.
+
+## 참조에 의한 전달과 외부 상태의 변경
+
+```jsx
+// 매개변수 primitive는 원시 값을 전달받고, 매개변수 obj는 객체를 전달받는다.
+function changeVal(primitive, obj) {
+  primitive += 100;
+  obj.name = 'Kim';
+}
+
+// 외부 상태
+var num = 100;
+var person = { name: 'Lee' };
+
+console.log(num); // 100
+console.log(person); // {name: "Lee"}
+
+// 원시 값은 값 자체가 복사되어 전달되고 객체는 참조 값이 복사되어 전달된다.
+changeVal(num, person);
+
+// 원시 값은 원본이 훼손되지 않는다.
+console.log(num); // 100
+
+// 객체는 원본이 훼손된다.
+console.log(person); // {name: "Kim"}
+```
+
+객체를 참조값으로 넘기다보면 변경을 추적하기 어려워진다
+
+이를 해결하기위해 객체를 불편값으로 동작하게끔 비용은 비싸지만 깊은복사를 통해 관리해 부수효과를 없앨수 있다.
+
+또한 외부 상태를 변경하지 않고, 외부 상태에 의존하지 않는 함수를 순수함수라고 하는데 이를 기반한 프로그래맹이 함수형 프로그래밍이다.
+
+함수형 프로그래밍은 부수효과를 최대한 억제해서 오류를 피하고 안정성을 높이려는 방식이다.
+
+## 다양한 함수의 형태
+
+- 즉시 실행 함수
+    - 기명함수로도 쓸수 있지만 한번만 호출되기때문에 보통 익명함수로 사용한다
+
+```jsx
+function foo(){}()
+```
+
+함수 선언문인 경우 자바스크립트 엔진이 세미콜론을 붙인다.
+
+function foo(){}; (); 이렇게 되어버려서 함수 호출 연산자가 아닌 그룹연산자로 해석되고 그룹연산자에 피연산자가 없어서 에러가 난다.
+
+```jsx
+(); //unexpected token
+```
+
+- 즉시 실행 함수도 일반 함수 처럼 값을 반환할수 있고, 인수를 전달할 수도 있다.
+
+```jsx
+// 즉시 실행 함수도 일반 함수처럼 값을 반환할 수 있다.
+var res = (function () {
+  var a = 3;
+  var b = 5;
+  return a * b;
+}());
+
+console.log(res); // 15
+
+// 즉시 실행 함수에도 일반 함수처럼 인수를 전달할 수 있다.
+res = (function (a, b) {
+  return a * b;
+}(3, 5));
+
+console.log(res); // 15
+```
+
+즉시 실행 함수는 변수나 함수 이름의 충동을 방지할 수 있다.
+
+### 중첩함수
+
+- 함수 내부에 정의된 함수를 말한다.
+- 중첩함수를 포함하는 함수는 외부 함수라고 부른다
+
+```jsx
+function outer() { //외부함수
+     var x = 1;
+   
+     // 중첩 함수,내부함수
+     function inner() {
+       var y = 2;
+       // 외부 함수의 변수를 참조할 수 있다.
+       console.log(x + y); // 3
+     }
+   
+     inner();
+   }
+outer();
+```
+
+```jsx
+function outer() {
+     var x = 1;
+     inner(); //호스팅이 일어나서 위에서 실행해도 된다.
+     // 중첩 함수
+     function inner() {
+       var y = 2;
+       // 외부 함수의 변수를 참조할 수 있다.
+       console.log(x + y); // 3
+     }
+     
+   }
+   outer();
+```
+
+### 콜백함수
+
+```jsx
+// n만큼 어떤 일을 반복한다.
+function repeat(n) {
+  // i를 출력한다.
+  for (var i = 0; i < n; i++) console.log(i);
+}
+
+repeat(5); // 0 1 2 3 4
+```
+
+여기서 repeat함수는 console.log()에 강하게 의존하고 있다.
+
+반복분내에 처리하는 일이 바뀐다면 함수를 새로 만들어줘야한다
+
+아래와 같다
+
+```jsx
+// n만큼 어떤 일을 반복한다.
+function repeat1(n) {
+  // i를 출력한다.
+  for (var i = 0; i < n; i++) console.log(i);
+}
+
+repeat1(5); // 0 1 2 3 4
+
+// n만큼 어떤 일을 반복한다.
+function repeat2(n) {
+  for (var i = 0; i < n; i++) {
+    // i가 홀수일 때만 출력한다.
+    if (i % 2) console.log(i);
+  }
+}
+
+repeat2(5); // 1 3
+```
+
+위 예제를 보면 함수에서 반복하는 일은 똑같고 이를 처리하는 로직만 다르다는것을 볼 수 있다.
+
+그렇다면 로직을 함수로 추상화하고, 외부에서 내부로 전달하게되면 함수를 여러개 선언할 필요가 사라진다.
+
+```jsx
+// 외부에서 전달받은 f를 n만큼 반복 호출한다.
+function repeat(n, f) {
+  for (var i = 0; i < n; i++) {
+    f(i); // i를 전달하면서 f를 호출
+  }
+}
+
+var logAll = function (i) {
+  console.log(i);
+};
+
+// 반복 호출할 함수를 인수로 전달한다.
+repeat(5, logAll); // 0 1 2 3 4
+
+var logOdds = function (i) {
+  if (i % 2) console.log(i);
+};
+
+// 반복 호출할 함수를 인수로 전달한다.
+repeat(5, logOdds); // 1 3
+```
+
+자바스크립트 함수는 일급객체이기때문에 값으로 사용할 수 있어서 매개변수에 값을 넣어줄 수 있다.
+
+위와 같은 구조로 더욱 유연한 구조를 가질수 있다.
+
+- 콜백함수
+    - 함수의 매개변수를 통해 다른 함수의 내부로 전달되는 함수 ex) logOdds,logAll
+- 고차함수
+    - 매개변수를 통해 함수의 외부에서 콜백함수를 전달받은 함수 ex) repeat
+
+```jsx
+// 익명 함수 리터럴을 콜백 함수로 고차 함수에 전달한다.
+// 익명 함수 리터럴은 repeat 함수를 호출할 때마다 평가되어 함수 객체를 생성한다.
+repeat(5, function (i) {
+  if (i % 2) console.log(i);
+}); // 1 3
+```
+
+콜백함수는 고차함수에 의해 호출되며 이때 고차함수는 필요에 따라 콜백 함수에 인수를 전달할 수 있다.
+
+고차함수 내부에서만 호출된다면 콜백함수를 익명 함수 리터럴로 정의하면서 곧바로 고차함수에 전달하는게 일반적이다.
+
+```
+// logOdds 함수는 단 한 번만 생성된다.
+var logOdds = function (i) {
+  if (i % 2) console.log(i);
+};
+
+// 고차 함수에 함수 참조를 전달한다.
+repeat(5, logOdds); // 1 3
+```
+
+이때 콜백함수로 쓰인 익명함수는 고차함수가 호출될때마다 객체를 생성한다
+
+자주 호출되는 고차함수라면 콜백함수를 정의한 후 함수 참조를 고차 함수에 전달하는게 좋다
+
+위 예제의 logOdds는 딱 한번만 생성된다.
+
+```
+// 콜백 함수를 사용한 이벤트 처리
+// myButton 버튼을 클릭하면 콜백 함수를 실행한다.
+document.getElementById('myButton').addEventListener('click', function () {
+  console.log('button clicked!');
+});
+
+// 콜백 함수를 사용한 비동기 처리
+// 1초 후에 메시지를 출력한다.
+setTimeout(function () {
+  console.log('1초 경과');
+}, 1000);
+```
+
+<aside>
+💡 모든 고차함수가 콜백함수를 실행하는것은 아니다
+settimeout에 경우 setTimeout이 콜백함수를 호출하지 않는다
+
+</aside>
+
+### 순수함수와 비순수 함수
+
+순수함수는 외부상태에 의존하지 않고 오직 매개변수를 통해 함수 내부로 전달된 인수에게만 의존해 값을 생성해 반환한다.
+
+순수 함수는 동일한 입력에 대해 항상 동일한 출력을 반환해야 한다
+
+보통 매개변수가 없은 순수함수는 상수와 같다. 그래서 의미가없다 순수함수는 매개변수가 적어도 1개이상이여야 의미가 있다.
+
+외부상태에는 전역변수, 서버 데이터, Console,DOM등이 있다.
+
+만약 외부 상태에는 의존하지 않고, 함수 내부 상태에만 의존한다 해도 그 내부 상태가 호출될때마다 변화하는 값(예 : 현재시간)이라면 순수함수가 아니다
+
+- 순수함수
+
+```jsx
+var count = 0; // 현재 카운트를 나타내는 상태
+
+// 순수 함수 increase는 동일한 인수가 전달되면 언제나 동일한 값을 반환한다.
+function increase(n) {
+  return ++n;
+}
+
+// 순수 함수가 반환한 결과값을 변수에 재할당해서 상태를 변경
+count = increase(count);
+console.log(count); // 1
+
+count = increase(count);
+console.log(count); // 2
+```
+
+- 비순수함수
+
+외부상태에 의존하거나 외부 상태를 변경하는 함수이다.
+
+외부 상태에 의존해서 부수효과가 일어남
+
+```jsx
+var count = 0; // 현재 카운트를 나타내는 상태: increase 함수에 의해 변화한다.
+
+// 비순수 함수
+function increase() {
+  return ++count; // 외부 상태에 의존하며 외부 상태를 변경한다.
+}
+
+// 비순수 함수는 외부 상태(count)를 변경하므로 상태 변화를 추적하기 어려워진다.
+increase();
+console.log(count); // 1
+
+increase();
+console.log(count); // 2
+```
+
+```jsx
+function getCurrentTimePlusOffset(offset) {
+    const currentTime = new Date().getTime();
+    return currentTime + offset;
+}
+
+console.log(getCurrentTimePlusOffset(1000)); // 현재 시간에 1000밀리초를 더한 값을 출력
+console.log(getCurrentTimePlusOffset(1000)); // 매번 다른 값을 출력
+```
+
+```jsx
+function incrementCounter() {
+    let counter = 0; // 내부 상태
+    counter += 1;
+    return counter;
+}
+
+console.log(incrementCounter()); // 1을 출력
+console.log(incrementCounter()); // 여전히 1을 출력
+```
+
+- 내부 상태에 의존하지만 순수 함수가 아닌  비순수 함수
+
+```jsx
+function createCounter() {
+    let counter = 0; // 내부 상태
+
+    return function() {
+        counter += 1; // 내부 상태 변경
+        return counter;
+    }
+}
+
+const incrementCounter = createCounter();
+
+console.log(incrementCounter()); // 1을 출력
+console.log(incrementCounter()); // 2를 출력
+console.log(incrementCounter()); // 3을 출력
+```
+
+똑같은 입력에도 출력이 다르다

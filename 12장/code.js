@@ -25,3 +25,28 @@ var add2  = (function addtest(){
 }());
 
 console.log(add2(1,2)); //a is not defined
+
+function add (x,y){
+     console.log(arguments); //[Arguments] { '0': 1, '1': 2, '2': 3 }
+     return x+y;
+}
+
+add(1,2,3);
+
+console.log( undefined || 0);
+
+function outer() {
+     var x = 1;
+     inner(); //호스팅이 일어나서 위에서 실행해도 된다.
+     // 중첩 함수
+     function inner() {
+       var y = 2;
+       // 외부 함수의 변수를 참조할 수 있다.
+       console.log(x + y); // 3
+     }
+   
+     
+   }
+   
+   outer();
+   
