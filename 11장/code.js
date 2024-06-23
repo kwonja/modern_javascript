@@ -51,3 +51,8 @@ console.log(copy); //{ name: 'Kim', address: 'Seoul' }
 
 
 
+
+var arr = new Array(1);
+arr[0]= new Array(1);
+
+console.log(arr);
