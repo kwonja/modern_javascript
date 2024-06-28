@@ -13,7 +13,7 @@ const promise1 = new Promise((resolve) => {
 const promise2 = new Promise((resolve) => {
    setTimeout(() => {
      resolve(4000)
-   }, 3000)
+   }, 4000)
  })
  const promise3 = new Promise((resolve) => {
     setTimeout(() => {
@@ -28,7 +28,7 @@ promise1.then(()=>{
     return promise3;
 }).then((e)=>{
     console.log(e);
-    console.timeEnd("측정");
+    Promise.all([promise2,promise3]).then(()=>{console.timeEnd("측정");}); //측정: 4.019s 생성이 된 시점에서 비동기처리는 진행되고 있다고 생각하면 된다.
 });
 
 //위 코드는 3초가 측정된다.

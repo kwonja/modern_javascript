@@ -14,6 +14,8 @@
 
   // 비동기를 병렬로 처리하고싶을때
   // reject가 발생할 경우 해당 내용만 전달한다.
+
+
  Promise.all([promise1, promise2, promise3,promise4])
    .then(console.log)
    .catch(console.error) //거부가 생기면 reject 상태로 넘어옴
