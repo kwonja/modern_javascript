@@ -23,7 +23,13 @@ function foo() {
 
 
 
-const arrow = () =>{
-    let radius=1;
+// const arrow = () =>{
+//     let radius=1;
+//   }
+//   new arrow(); //arrow is not a constructor
+
+let p = {
+  a: function a(){
+    console.log(this);
   }
-  new arrow(); //arrow is not a constructor
+}
